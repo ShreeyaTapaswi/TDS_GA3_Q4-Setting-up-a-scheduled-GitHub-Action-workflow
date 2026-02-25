@@ -1,0 +1,34 @@
+name: Daily Scheduled Commit
+
+on:
+  schedule:
+    # Runs every day at 05:30 UTC — cron format: minute hour day month weekday
+    - cron: '30 5 * * *'
+  workflow_dispatch: # This lets you trigger it manually for testing
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest  # Uses a fresh Linux computer in the cloud
+
+    steps:
+      # Step 1: Download your repo's files onto that cloud computer
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: This is the required step — it has your email in the name
+      - name: Run daily update for 24f2004399@ds.study.iitm.ac.in
+        run: |
+          echo "Daily update run at $(date)" >> daily_log.txt
+
+      # Step 3: Set up Git identity so it knows who's making the commit
+      - name: Configure Git
+        run: |
+          git config user.email "24f2004399@ds.study.iitm.ac.in"
+          git config user.name "GitHub Actions Bot"
+
+      # Step 4: Save the change as a commit and push it back to GitHub
+      - name: Commit and push changes
+        run: |
+          git add daily_log.txt
+          git commit -m "Daily automated commit - $(date '+%Y-%m-%d %H:%M:%S')"
+          git push
